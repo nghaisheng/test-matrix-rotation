@@ -1,0 +1,142 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<title>Factorial Test</title>
+	<style type="text/css">
+		.error {
+			color: red;
+		}
+		#result {
+			font-weight: bold;
+		}
+	</style>
+</head>
+<body>
+	<p>The first line contains M N R</p>
+	<p><i>M = number of rows (min. 2), N = number of columns (max. 300), R = number of times to be rotated (1 - 109)</i></p>
+	<p>The next line until end is the matrix which using space as separator</p>
+	<textarea name="number1" id="number1" rows="10" cols="50"></textarea>
+	<button>Result</button>
+	<p class="error"></p>
+	<pre id="result"></pre>
+
+	<script src="js/jquery.min.js"></script>
+	<script type="text/javascript">
+		$(document).ready(function() {
+
+			function rotate(mat, r1, c1, r2, c2) {
+				var sr, sc, i, j, temp, temp2;
+				sr = r1;
+				sc = c1;
+				temp = mat[r1][c1];
+
+				for (i = r1+1; i <= r2; i++) {
+					temp2 = mat[i][c1];
+					mat[i][c1] = temp;
+					temp = temp2;
+				}
+				r1++;
+				for (i = c1+1; i <= c2; i++) {
+					temp2 = mat[r2][i];
+					mat[r2][i] = temp;
+					temp = temp2;
+				}
+				c1++;
+				if (r1-1 < r2) {
+					for (i = r2-1; i >= r1-1; i--) {
+						temp2 = mat[i][c2];
+						mat[i][c2] = temp;
+						temp = temp2;
+					}
+				}
+				c2--;
+				if (c1-1 < c2) {
+					for (i = c2; i >= c1; i--) {
+						temp2 = mat[r1-1][i];
+						mat[r1-1][i] = temp;
+						temp = temp2;
+					}
+				}
+				r2--;
+				mat[sr][sc] = temp;
+				return;
+			}
+
+			$('button').click(function() {
+				$('.error').text('');
+				$('#result').text('');
+				var lines = $('#number1').val().split('\n');
+				if (lines.length < 3) {
+					$('.error').text('Please fill the textbox.');
+					return;
+				}
+				var line1 = lines[0].split(' ');
+				if (line1.length !== 3) {
+					$('.error').text('First line is require M N R.');
+					return;
+				}
+
+				var row, col, times, i, j, temp;
+				var mat;
+				var result = '';
+				row = line1[0];
+				col = line1[1];
+				times = line1[2];
+				if (row === '' || isNaN(row) || col === '' || isNaN(col) || times === '' || isNaN(times)) {
+					$('.error').text('The first line must be numeric.');
+					return;
+				}
+				if (row < 2) {
+					$('.error').text('M may not be lower than 2.');
+					return;
+				}
+				if (col > 300) {
+					$('.error').text('N may not be lower than 2.');
+					return;
+				}
+				if (times < 1 || times > 109) {
+					$('.error').text('R should be in 1 - 109.');
+					return;
+				}
+				if (lines.length-1 != row) {
+					$('.error').text('Matrix rows is not match.');
+					return;
+				}
+				mat = [];
+				for (i = 1; i < lines.length; i++) {
+					temp = lines[i].split(' ');
+					if (temp.length != col) {
+						$('.error').text('Matrix columns is not match.');
+						return;
+					}
+					mat.push(temp);
+				}
+
+				var r1, c1, r2, c2;
+				r1 = 0;
+				c1 = 0;
+				r2 = row-1;
+				c2 = col-1;
+				while (r1 < r2 && c1 < c2) {
+					var rot = 2*(r2-r1)+2*(c2-c1);
+					temp = times % rot;
+					for (i = 1; i <= temp; i++) {
+						rotate(mat, r1, c1, r2, c2);
+					}
+					r1++;
+					c1++;
+					r2--;
+					c2--;
+				}
+				for (i = 0; i < row; i++) {
+					for (j = 0; j < col; j++) {
+						result += " "+mat[i][j];
+					}
+					result += "\n";
+				}
+				$('#result').text(result);
+			});
+		});
+	</script>
+</body>
+</html>
